@@ -16,6 +16,7 @@ public class Main {
         for (int i = 0; i< filesPath.length;i++)
             dataManagers[i] = new DataManager(filesPath[i]);
 
+        //start threads
         for (int i = 0; i < dataManagers.length; ++i) {
             Thread t = new Thread(dataManagers[i]);
             t.start();

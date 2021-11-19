@@ -1,5 +1,10 @@
 
+import javax.xml.crypto.Data;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class DataPreparer {
@@ -9,10 +14,21 @@ public class DataPreparer {
     private PreparedData preparedData;
     private File file;
 
+    private DataPreparer() {
+        super();
+    }
+
     public DataPreparer(File inputFile) {
         preparedData = new PreparedData();
         preparedData.setContentTotally(DirectoryManager.getContentOfTheSingleFile((File) inputFile).split(" "));
         this.file = inputFile;
+        generatePreparedData();
+    }
+
+    public static DataPreparer getSimpleInstance(File inputFile) {
+        DataPreparer result = new DataPreparer();
+        result.file = inputFile;
+        return result;
     }
 
     public PreparedData getPreparedData() {
@@ -29,9 +45,8 @@ public class DataPreparer {
                 throw new NullPointerException();
             else file = this.file;
         }
-        if (outputPathname == null) {
+        if (outputPathname == null)
             outputPathname = file.getPath().replace("input", "output");
-        }
         DirectoryManager.createDirectory(outputPathname);
         File generatedFile = new File(outputPathname);
         try {
@@ -39,6 +54,17 @@ public class DataPreparer {
             preparedData = prepareData();
             printWriter.println(preparedData);
             printWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToFileAtFirstLine(String toWrite) {
+        Path path = Paths.get(file.getPath().replace("input", "output"));
+        try {
+            List<String> fileContent = Files.readAllLines(path, StandardCharsets.UTF_8);
+            fileContent.add(0, toWrite);
+            Files.write(path, fileContent, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,7 +110,7 @@ public class DataPreparer {
         return wordsList;
     }
 
-    private String deleteSpecialChar(String in){
+    private String deleteSpecialChar(String in) {
         return in.replaceAll("[^a-zA-Z0-9]", "");
     }
 }

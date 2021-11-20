@@ -13,6 +13,57 @@ public class DataManager implements Runnable {
     private Double pearsonLinearCorrelationCoeficient = null;
     private Double regressionCoefficientA = null, regressionCoefficientB = null;
     private File[] files = null;
+    private boolean generateFiles = false;
+
+    /**
+     * @return info about statistical data like minimums, maximums, medians (means),
+     * averages, quartiles, interquartiles, qunatiles separetly for important words and all of words
+     */
+    public CalculatedData getData() {
+        return data;
+    }
+
+    /**
+     * @return a list with file information, String arrays containing important words, unimportant words and all words
+     */
+    public ArrayList<PreparedData> getPreparedDataList() {
+        return preparedDataList;
+    }
+
+    /**
+     * @return a list of distant (remote) points for all words
+     */
+    public ArrayList<PreparedData> getRemotePointsTotally() {
+        return remotePointsTotally;
+    }
+
+    /**
+     * @return a list of distant (remote) points for important words
+     */
+    public ArrayList<PreparedData> getRemotePointsImportant() {
+        return remotePointsImportant;
+    }
+
+    public Double getPearsonLinearCorrelationCoeficient() {
+        return pearsonLinearCorrelationCoeficient;
+    }
+
+    public double[] getRegressionArray(PreparedData[] pd) {
+        double[] resultArray = new double[pd.length];
+        for (int i =0; i<resultArray.length;i++)
+            resultArray[i] = getRegression(pd[i].getImportantContent().length);
+        return resultArray;
+    }
+
+    public double getRegression(PreparedData pd) {
+        return getRegression(pd.getImportantContent().length);
+    }
+
+    public double getRegression(int totalLengthOfContent) {
+        if (regressionCoefficientA == null || regressionCoefficientB == null)
+            calculateParametersOfLinearRegressionFunction();
+        return totalLengthOfContent * regressionCoefficientB + regressionCoefficientA;
+    }
 
     public DataManager(String inputPathname) {
         this.inputPathname = inputPathname;
@@ -34,7 +85,12 @@ public class DataManager implements Runnable {
         generateRaport();
     }
 
+    /**
+     * Generates a report files if the method setGenerateFiles is set to true.
+     */
     private void generateRaport() {
+        if(generateFiles == false)
+            return;
         try {
             PrintWriter printWriter = new PrintWriter(
                     new FileWriter(
@@ -50,6 +106,10 @@ public class DataManager implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setGenerateFiles(boolean isFilesNeedToBeGenerated){
+        generateFiles = isFilesNeedToBeGenerated;
     }
 
     private void loadFiles() {
@@ -133,7 +193,7 @@ public class DataManager implements Runnable {
         loadFiles();
         for(int i = 0; i < files.length; i++){
             DataPreparer.getSimpleInstance(files[i]).writeToFileAtFirstLine( "Regression prediction for important words = "
-                    + getRegression(preparedDataList.get(i).getContentTotally().length));
+                    + getRegression(preparedDataList.get(i).getImportantContent().length));
         }
     }
 
@@ -153,11 +213,5 @@ public class DataManager implements Runnable {
         nxPow *= preparedDataList.size();
         regressionCoefficientB = ((double) (nxy - (nx * ny))) / ((double) (nxPow - (nx * nx)));
         regressionCoefficientA = data.arithmeticAverageImportant - (regressionCoefficientB * data.arithmeticAverageTotally);
-    }
-
-    public double getRegression(int totalLengthOfContent) {
-        if (regressionCoefficientA == null || regressionCoefficientB == null)
-            calculateParametersOfLinearRegressionFunction();
-        return totalLengthOfContent * regressionCoefficientB + regressionCoefficientA;
     }
 }

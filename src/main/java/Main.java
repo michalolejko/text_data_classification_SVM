@@ -2,20 +2,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        List<Thread> threads = new ArrayList<>();
-        String[] filesPath = {
+        String[] aclImbdPaths = {
                 "input/aclImdb/train/pos/",
                 "input/aclImdb/train/neg/",
                 "input/aclImdb/train/unsup/",
                 "input/aclImdb/test/pos/",
                 "input/aclImdb/test/neg/"
         };
-        DataManager[] dataManagers = new DataManager[filesPath.length];
-        for (int i = 0; i< filesPath.length;i++)
-            dataManagers[i] = new DataManager(filesPath[i]);
 
+        DataManager[] dataManagers = calculateStatisticalData(aclImbdPaths);
+    }
+
+    private static DataManager[] calculateStatisticalData(String[] filesPaths){
+        if(filesPaths.length <= 0)
+            return null;
+        DataManager[] dataManagers = new DataManager[filesPaths.length];
+        List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i< filesPaths.length;i++) {
+            dataManagers[i] = new DataManager(filesPaths[i]);
+            //Odkomentuj jeśli potrzebujesz wygenerowanych plików
+            dataManagers[i].setGenerateFiles(true);
+        }
         //start threads
         for (int i = 0; i < dataManagers.length; ++i) {
             Thread t = new Thread(dataManagers[i]);
@@ -24,6 +33,11 @@ public class Main {
         }
         //Wait for threads
         for (Thread t : threads)
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        return dataManagers;
     }
 }

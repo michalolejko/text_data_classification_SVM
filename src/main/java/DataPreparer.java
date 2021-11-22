@@ -13,16 +13,24 @@ public class DataPreparer {
 
     private PreparedData preparedData;
     private File file;
+    private boolean generateFiles = false;
 
     private DataPreparer() {
         super();
     }
 
     public DataPreparer(File inputFile) {
+        this(inputFile, true);
+    }
+
+    public DataPreparer(File inputFile, boolean generateFiles) {
         preparedData = new PreparedData();
         preparedData.setContentTotally(DirectoryManager.getContentOfTheSingleFile((File) inputFile).split(" "));
         this.file = inputFile;
-        generatePreparedData();
+        this.generateFiles = generateFiles;
+        preparedData = prepareData();
+        if(generateFiles == true)
+            generatePreparedData();
     }
 
     public static DataPreparer getSimpleInstance(File inputFile) {
@@ -51,7 +59,6 @@ public class DataPreparer {
         File generatedFile = new File(outputPathname);
         try {
             PrintWriter printWriter = new PrintWriter(new FileWriter(generatedFile));
-            preparedData = prepareData();
             printWriter.println(preparedData);
             printWriter.close();
         } catch (IOException e) {
@@ -60,6 +67,8 @@ public class DataPreparer {
     }
 
     public void writeToFileAtFirstLine(String toWrite) {
+        if(generateFiles == false)
+            return;
         Path path = Paths.get(file.getPath().replace("input", "output"));
         try {
             List<String> fileContent = Files.readAllLines(path, StandardCharsets.UTF_8);

@@ -50,7 +50,7 @@ public class DataManager implements Runnable {
 
     public double[] getRegressionArray(PreparedData[] pd) {
         double[] resultArray = new double[pd.length];
-        for (int i =0; i<resultArray.length;i++)
+        for (int i = 0; i < resultArray.length; i++)
             resultArray[i] = getRegression(pd[i].getImportantContent().length);
         return resultArray;
     }
@@ -83,13 +83,31 @@ public class DataManager implements Runnable {
         addRegressionInfoToFiles();
 
         generateRaport();
+
+        //punkt 7 - analiza statystyczna
+        generateCharts();
+
+    }
+
+    private void generateCharts() {
+        if (generateFiles == false)
+            return;
+        try {
+            ChartsGenerator chartsGenerator = new ChartsGenerator();
+            chartsGenerator.generateWordsLineChart(getPreparedDataList());
+            chartsGenerator.generateHistogram(getPreparedDataList());
+            chartsGenerator.generateBoxCharts(getPreparedDataList(), getData());
+            chartsGenerator.generateScatterPlot(getPreparedDataList(), getData());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Generates a report files if the method setGenerateFiles is set to true.
      */
     private void generateRaport() {
-        if(generateFiles == false)
+        if (generateFiles == false)
             return;
         try {
             PrintWriter printWriter = new PrintWriter(
@@ -108,7 +126,7 @@ public class DataManager implements Runnable {
         }
     }
 
-    public void setGenerateFiles(boolean isFilesNeedToBeGenerated){
+    public void setGenerateFiles(boolean isFilesNeedToBeGenerated) {
         generateFiles = isFilesNeedToBeGenerated;
     }
 
@@ -130,7 +148,7 @@ public class DataManager implements Runnable {
         loadFiles();
         preparedDataList = new ArrayList<>();
         for (File file : files) {
-            DataPreparer dataPreparer = new DataPreparer(file);
+            DataPreparer dataPreparer = new DataPreparer(file, generateFiles);
             preparedDataList.add(dataPreparer.getPreparedData());
         }
         this.data = new CalculatedData(preparedDataList);
@@ -191,8 +209,8 @@ public class DataManager implements Runnable {
      */
     private void addRegressionInfoToFiles() {
         loadFiles();
-        for(int i = 0; i < files.length; i++){
-            DataPreparer.getSimpleInstance(files[i]).writeToFileAtFirstLine( "Regression prediction for important words = "
+        for (int i = 0; i < files.length; i++) {
+            DataPreparer.getSimpleInstance(files[i]).writeToFileAtFirstLine("Regression prediction for important words = "
                     + getRegression(preparedDataList.get(i).getImportantContent().length));
         }
     }

@@ -22,8 +22,8 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i< filesPaths.length;i++) {
             dataManagers[i] = new DataManager(filesPaths[i]);
-            //Odkomentuj jeśli potrzebujesz wygenerowanych plików
-            dataManagers[i].setGenerateFiles(true);
+            //false = bez generowania plikow, true = generowanie plikow (pliki .txt)
+            dataManagers[i].setGenerateFiles(false);
         }
         //start threads
         for (int i = 0; i < dataManagers.length; ++i) {

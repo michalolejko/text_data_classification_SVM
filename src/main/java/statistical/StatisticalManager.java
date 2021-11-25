@@ -3,7 +3,7 @@ package statistical;
 import java.io.*;
 import java.util.ArrayList;
 
-public abstract class DataManager implements Runnable, Serializable {
+public abstract class StatisticalManager implements Runnable, Serializable {
 
     protected String inputPathname, outputPath;
     protected CalculatedData data;

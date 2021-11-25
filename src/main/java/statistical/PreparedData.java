@@ -1,6 +1,8 @@
 package statistical;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public class PreparedData implements Serializable {
 
@@ -71,5 +73,26 @@ public class PreparedData implements Serializable {
         }
         sb.append("\n__________________________________________________________________________________________\n");
         return sb.toString();
+    }
+
+    public String toCsvFormat(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Totally,").append(oneArrayToCsvFormat(contentTotally));
+        sb.append("Important,").append(oneArrayToCsvFormat(importantContent));
+        sb.append("Irrelevant,").append(oneArrayToCsvFormat(irrelevantContent));
+        return sb.toString();
+    }
+
+    private StringBuilder oneArrayToCsvFormat(String[] array){
+        Iterator<String> iterator = Arrays.asList(array).iterator();
+        StringBuilder sb = new StringBuilder();
+        while (iterator.hasNext()) {
+            sb.append(iterator.next());
+            if (iterator.hasNext()) {
+                sb.append(',');
+            }
+        }
+        sb.append("\n");
+        return sb;
     }
 }

@@ -3,12 +3,12 @@ package statistical;
 import java.io.*;
 import java.util.ArrayList;
 
-public class DataManagerAcllmbd extends DataManager {
+public class StatisticalManagerAcllmbd extends StatisticalManager {
 
     private File[] files = null;
     private int delimiter;
 
-    public DataManagerAcllmbd(int delimiter, String inputPathname) {
+    public StatisticalManagerAcllmbd(int delimiter, String inputPathname) {
         this.inputPathname = inputPathname;
         outputPath = "output/" + (inputPathname.substring(inputPathname.indexOf("/") + 1)
                 .replaceAll("/", "_"));

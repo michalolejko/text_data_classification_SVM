@@ -1,14 +1,14 @@
-package statistical;
+import statistical.StatisticalManager;
+import statistical.StatisticalManagerAcllmbd;
+import statistical.StatisticalManagerAmazon;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainManagement {
 
-    private static final String[] aclImbdPaths = {
+    public static final String[] aclImbdPaths = {
             "input/aclImdb/train/pos/",
             "input/aclImdb/train/neg/",
             // "input/aclImdb/train/unsup/", //Nie obslugujemy juz tego
@@ -16,17 +16,18 @@ public class MainManagement {
             "input/aclImdb/test/neg/"
     };
 
-    private static final String[] amazonPaths = {
+    public static final String[] amazonPaths = {
             "input/amazon/test.ft.txt",
             "input/amazon/train.ft.txt"
     };
 
 
-    public static DataManager[] calculateStatisticalDataAcllmbd(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
-        DataManagerAcllmbd[] dataManagerAcllmbds = new DataManagerAcllmbd[aclImbdPaths.length];
+    public static StatisticalManager[] calculateStatisticalDataAcllmbd(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
+        delimiter = Math.min(delimiter, aclImbdPaths.length);
+        StatisticalManagerAcllmbd[] dataManagerAcllmbds = new StatisticalManagerAcllmbd[delimiter];
         List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < aclImbdPaths.length; i++) {
-            dataManagerAcllmbds[i] = new DataManagerAcllmbd(delimiter, aclImbdPaths[i]);
+        for (int i = 0; i < delimiter; i++) {
+            dataManagerAcllmbds[i] = new StatisticalManagerAcllmbd(delimiter, aclImbdPaths[i]);
 
             dataManagerAcllmbds[i].setGenerateFiles(generateTxtFiles);
             dataManagerAcllmbds[i].setGenerateCharts(generateCharts);
@@ -42,7 +43,7 @@ public class MainManagement {
                 dataManagerAcllmbds[i].setNegativeData();
         }
         //start threads
-        for (int i = 0; i < dataManagerAcllmbds.length; ++i) {
+        for (int i = 0; i < delimiter; ++i) {
             Thread t = new Thread(dataManagerAcllmbds[i]);
             t.start();
             threads.add(t);
@@ -57,14 +58,14 @@ public class MainManagement {
         return dataManagerAcllmbds;
     }
 
-    public static DataManager[] calculateStatisticalDataAmazon(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
-        DataManagerAmazon[] dataManagerAmazon = new DataManagerAmazon[amazonPaths.length * 2];
+    public static StatisticalManager[] calculateStatisticalDataAmazon(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
+        StatisticalManagerAmazon[] dataManagerAmazon = new StatisticalManagerAmazon[amazonPaths.length * 2];
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < amazonPaths.length; i++) {
             try {
                 int index = i * 2;
-                dataManagerAmazon[index] = new DataManagerAmazon();
-                dataManagerAmazon[index + 1] = new DataManagerAmazon();
+                dataManagerAmazon[index] = new StatisticalManagerAmazon();
+                dataManagerAmazon[index + 1] = new StatisticalManagerAmazon();
 
                 dataManagerAmazon[index].setPositiveData();
                 dataManagerAmazon[index].setGenerateFiles(generateTxtFiles);

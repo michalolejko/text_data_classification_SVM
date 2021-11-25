@@ -2,11 +2,11 @@ package statistical;
 
 import java.util.ArrayList;
 
-public class DataManagerAmazon extends DataManager {
+public class StatisticalManagerAmazon extends StatisticalManager {
 
     public ArrayList<String> dataToPrepare;
 
-    public DataManagerAmazon() {
+    public StatisticalManagerAmazon() {
         dataToPrepare = new ArrayList<>();
         this.preparedDataList = new ArrayList<>();
     }

@@ -1,19 +1,39 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+package statistical;
+
+import java.io.*;
 import java.util.ArrayList;
 
-public class DataManager implements Runnable {
+public abstract class DataManager implements Runnable, Serializable {
 
-    private String inputPathname, outputPath;
-    private CalculatedData data;
-    private ArrayList<PreparedData> preparedDataList;
-    private ArrayList<PreparedData> remotePointsTotally, remotePointsImportant;
-    private Double pearsonLinearCorrelationCoeficient = null;
-    private Double regressionCoefficientA = null, regressionCoefficientB = null;
-    private File[] files = null;
-    private boolean generateFiles = false;
+    protected String inputPathname, outputPath;
+    protected CalculatedData data;
+    protected ArrayList<PreparedData> preparedDataList;
+    protected ArrayList<PreparedData> remotePointsTotally, remotePointsImportant;
+    protected Double pearsonLinearCorrelationCoeficient = null;
+    protected Double regressionCoefficientA = null, regressionCoefficientB = null;
+    protected boolean isPositiveData = true, isNegativeData = false, isTrainData = true, isTestData = false;
+
+    protected boolean generateFiles = false, generateCharts = false;
+
+    public void setPositiveData() {
+        isPositiveData = true;
+        isNegativeData = false;
+    }
+
+    public void setNegativeData() {
+        isPositiveData = false;
+        isNegativeData = true;
+    }
+
+    public void setTrainData() {
+        isTrainData = true;
+        isTestData = false;
+    }
+
+    public void setTestData() {
+        isTrainData = false;
+        isTestData = true;
+    }
 
     /**
      * @return info about statistical data like minimums, maximums, medians (means),
@@ -65,35 +85,24 @@ public class DataManager implements Runnable {
         return totalLengthOfContent * regressionCoefficientB + regressionCoefficientA;
     }
 
-    public DataManager(String inputPathname) {
-        this.inputPathname = inputPathname;
-        outputPath = "output/" + (inputPathname.substring(inputPathname.indexOf("/") + 1)
-                .replaceAll("/", "_"));
-    }
-
     @Override
     public void run() {
-        //punkt 2 - analiza statystyczna
-        calculateData();
-        //punkt 3 - analiza statystyczna
-        identifyRemotePoints();
-        //punkt 4 - analiza statystyczna
-        calculatePearsonLCC();
-        //punkt 6 - analiza statystyczna
-        addRegressionInfoToFiles();
-
-        generateRaport();
-
-        //punkt 7 - analiza statystyczna
-        generateCharts();
-
     }
 
-    private void generateCharts() {
-        if (generateFiles == false)
+    protected void generateFilesAndCharts() {
+        if (generateFiles)
+            generateRaport();
+        if (generateCharts)
+            generateCharts();
+    }
+
+    protected void generateCharts() {
+        if (inputPathname == null) {
+            System.out.println("Nie podano sciezki dla wygenerowania wykresow.");
             return;
+        }
         try {
-            ChartsGenerator chartsGenerator = new ChartsGenerator();
+            ChartsGenerator chartsGenerator = new ChartsGenerator(inputPathname.substring(inputPathname.indexOf("/") + 1));
             chartsGenerator.generateWordsLineChart(getPreparedDataList());
             chartsGenerator.generateHistogram(getPreparedDataList());
             chartsGenerator.generateBoxCharts(getPreparedDataList(), getData());
@@ -106,34 +115,17 @@ public class DataManager implements Runnable {
     /**
      * Generates a report files if the method setGenerateFiles is set to true.
      */
-    private void generateRaport() {
-        if (generateFiles == false)
-            return;
-        try {
-            PrintWriter printWriter = new PrintWriter(
-                    new FileWriter(
-                            new File(outputPath.substring(0, outputPath.length() - 1) + ".txt")));
-            if (data != null)
-                printWriter.println(this.data);
-            if (pearsonLinearCorrelationCoeficient != null)
-                printWriter.println("\nPearson Linear Correlation Coeficient = "
-                        + pearsonLinearCorrelationCoeficient + "\n");
-            if (remotePointsImportant != null && remotePointsTotally != null)
-                printWriter.println(remotePointsToString());
-            printWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected void generateRaport() {
+    }
+
+    public void setGenerateCharts(boolean generateCharts) {
+        this.generateCharts = generateCharts;
     }
 
     public void setGenerateFiles(boolean isFilesNeedToBeGenerated) {
         generateFiles = isFilesNeedToBeGenerated;
     }
 
-    private void loadFiles() {
-        if (files == null)
-            files = new DirectoryManager(inputPathname).getFiles();
-    }
 
     /**
      * 2. Wyznaczenie dla zmiennych oznaczających liczbę wszystkich słów w dokumencie oraz
@@ -144,13 +136,7 @@ public class DataManager implements Runnable {
      *  rozstępy międzykwartylowe dla zmiennych (IQR=Q3-Q1),
      *  kwantyle rzędu 0.1, 0.9.
      */
-    private void calculateData() {
-        loadFiles();
-        preparedDataList = new ArrayList<>();
-        for (File file : files) {
-            DataPreparer dataPreparer = new DataPreparer(file, generateFiles);
-            preparedDataList.add(dataPreparer.getPreparedData());
-        }
+    protected void calculateData() {
         this.data = new CalculatedData(preparedDataList);
     }
 
@@ -158,7 +144,7 @@ public class DataManager implements Runnable {
      * 3. Identyfikację punktów oddalonych (dokumentów tekstowych dla których długość słów
      * spełnia określone warunki).
      */
-    private void identifyRemotePoints() {
+    protected void identifyRemotePoints() {
         if (preparedDataList == null) {
             remotePointsTotally = null;
             remotePointsImportant = null;
@@ -176,7 +162,7 @@ public class DataManager implements Runnable {
         }
     }
 
-    private String remotePointsToString() {
+    protected String remotePointsToString() {
         if (remotePointsTotally == null || remotePointsImportant == null)
             return "";
         StringBuilder sb = new StringBuilder();
@@ -192,8 +178,7 @@ public class DataManager implements Runnable {
     /**
      * 4. Wyznaczenie współczynnika korelacji liniowej Pearsona pomiędzy liczbą słów a klasą
      */
-    private void calculatePearsonLCC() {
-        //remotePointsTotally, remotePointsImportant;
+    protected void calculatePearsonLCC() {
         double covariance = 0;
         int n = preparedDataList.size();
         for (int i = 0; i < n; i++)
@@ -207,16 +192,8 @@ public class DataManager implements Runnable {
      * 6. Dokonanie prostej regresji liniowej pomiędzy wybranymi parami zmiennych.
      * [ PS. Szukamy przewidywanej liczby słów kluczowych względem liczby wszystkich słów. ]
      */
-    private void addRegressionInfoToFiles() {
-        loadFiles();
-        for (int i = 0; i < files.length; i++) {
-            DataPreparer.getSimpleInstance(files[i]).writeToFileAtFirstLine("Regression prediction for important words = "
-                    + getRegression(preparedDataList.get(i).getImportantContent().length));
-        }
-    }
-
     // Obliczanie Parametrów Liniowej Funkcji Regresji
-    private void calculateParametersOfLinearRegressionFunction() {
+    protected void calculateParametersOfLinearRegressionFunction() {
         // x -> totallies; y -> importants;
         int nxy = 0, nxPow = 0, nx = 0, ny = 0, x, y;
         for (PreparedData pd : preparedDataList) {

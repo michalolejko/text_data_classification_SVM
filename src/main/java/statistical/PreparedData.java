@@ -1,6 +1,8 @@
+package statistical;
 
-public class PreparedData {
+import java.io.Serializable;
 
+public class PreparedData implements Serializable {
 
     private String filePath;
     private String[] contentTotally, irrelevantContent, importantContent;
@@ -41,9 +43,10 @@ public class PreparedData {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("__________________________________________________________________________________________\n");
-        sb.append("Words count: \ntotally = ").append(contentTotally.length)
-                .append("\nirrelevant = ").append(irrelevantContent.length)
-                .append("\nimportant = ").append(importantContent.length);
+        sb.append("Words count: \ntotally = ").append(contentTotally.length);
+        if (irrelevantContent != null)
+            sb.append("\nirrelevant = ").append(irrelevantContent.length);
+        sb.append("\nimportant = ").append(importantContent.length);
         sb.append("\n__________________________________________________________________________________________\n");
         sb.append("\nContent: (toLowerCase): \n");
         sb.append("\n__________________________________________________________________________________________\n");
@@ -53,10 +56,12 @@ public class PreparedData {
             sb.append(" ");
         }
         sb.append("\n__________________________________________________________________________________________\n");
-        sb.append("\n\nIrrelevant:\n");
-        for (String el : irrelevantContent) {
-            sb.append(el);
-            sb.append(" ");
+        if (irrelevantContent != null) {
+            sb.append("\n\nIrrelevant:\n");
+            for (String el : irrelevantContent) {
+                sb.append(el);
+                sb.append(" ");
+            }
         }
         sb.append("\n__________________________________________________________________________________________\n");
         sb.append("\n\nImportant:\n");

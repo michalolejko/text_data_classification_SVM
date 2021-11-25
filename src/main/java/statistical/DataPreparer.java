@@ -1,5 +1,5 @@
+package statistical;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.util.*;
 
 public class DataPreparer {
 
-    private final String stopWordsPath = "input/stop_words_english.txt";
+    private final String stopWordsPath = "useful_files/stop_words_english.txt";
 
     private PreparedData preparedData;
     private File file;
@@ -29,7 +29,7 @@ public class DataPreparer {
         this.file = inputFile;
         this.generateFiles = generateFiles;
         preparedData = prepareData();
-        if(generateFiles == true)
+        if(generateFiles)
             generatePreparedData();
     }
 
@@ -67,7 +67,7 @@ public class DataPreparer {
     }
 
     public void writeToFileAtFirstLine(String toWrite) {
-        if(generateFiles == false)
+        if(!generateFiles)
             return;
         Path path = Paths.get(file.getPath().replace("input", "output"));
         try {
@@ -92,7 +92,7 @@ public class DataPreparer {
         return result;
     }
 
-    private Map<String, ArrayList<String>> splitContent(String[] fullContent) {
+    public Map<String, ArrayList<String>> splitContent(String[] fullContent) {
         ArrayList<String> importantWords = new ArrayList<>(), irrelevantWords = new ArrayList<>();
         ArrayList<String> stopWords = getStopWords();
         HashMap<String, ArrayList<String>> result = new HashMap();
@@ -106,7 +106,7 @@ public class DataPreparer {
         return result;
     }
 
-    private ArrayList<String> getStopWords() {
+    public ArrayList<String> getStopWords() {
         ArrayList<String> wordsList = new ArrayList<>();
         try {
             Scanner read = new Scanner(new File(stopWordsPath));
@@ -119,7 +119,7 @@ public class DataPreparer {
         return wordsList;
     }
 
-    private String deleteSpecialChar(String in) {
+    public String deleteSpecialChar(String in) {
         return in.replaceAll("[^a-zA-Z0-9]", "");
     }
 }

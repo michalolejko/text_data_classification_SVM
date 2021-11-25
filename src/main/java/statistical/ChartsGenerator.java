@@ -1,5 +1,6 @@
+package statistical;
+
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -10,7 +11,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.xy.XYDataset;
@@ -23,6 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ChartsGenerator {
+
+    private String path;
+
+    public ChartsGenerator(String path) {
+        this.path = path;
+    }
 
     /**
      * histogramy zmiennych
@@ -38,7 +44,7 @@ public class ChartsGenerator {
         JFreeChart histogram = ChartFactory.createHistogram("Liczebnosc slow znaczacych w dokumentach",
                 "L. Slow", "Ilosc", dataset);
 
-        ChartUtils.saveChartAsPNG(new File("charts/histogram.png"), histogram, 3000, 4000);
+        generateChart("histogram", histogram, 3000, 4000);
     }
 
     /**
@@ -47,7 +53,7 @@ public class ChartsGenerator {
     public void generateBoxCharts(ArrayList<PreparedData> preparedDataList, CalculatedData data) throws IOException {
 
         ArrayList<Number> values = new ArrayList();
-        for(int i = 0; i < preparedDataList.size(); i ++) {
+        for (int i = 0; i < preparedDataList.size(); i++) {
             values.add(preparedDataList.get(i).getImportantContent().length);
         }
 
@@ -67,7 +73,7 @@ public class ChartsGenerator {
                 "Wykres pudelkowy dla istotnej liczby znakow",
                 plot
         );
-        ChartUtils.saveChartAsPNG(new File("charts/box.png"), chart, 1000, 600);
+        generateChart("box", chart, 1000, 600);
     }
 
     /**
@@ -82,23 +88,22 @@ public class ChartsGenerator {
                 "X", "Y", dataset);
 
 
-        XYPlot plot = (XYPlot)chart.getPlot();
-        plot.setBackgroundPaint(new Color(255,228,196));
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setBackgroundPaint(new Color(255, 228, 196));
 
-        ChartUtils.saveChartAsPNG(new File("charts/plot.png"), chart, 9000, 2000);
-
+        generateChart("plot", chart);
     }
 
     private XYDataset createDataset(ArrayList<PreparedData> preparedDataList) {
         XYSeriesCollection dataset = new XYSeriesCollection();
 
         XYSeries series1 = new XYSeries("Wszystkie słowa");
-        for(int i = 0; i < preparedDataList.size(); i++) {
+        for (int i = 0; i < preparedDataList.size(); i++) {
             series1.add(i, preparedDataList.get(i).getContentTotally().length);
         }
 
         XYSeries series2 = new XYSeries("Słowa istotne");
-        for(int i = 0; i < preparedDataList.size(); i++) {
+        for (int i = 0; i < preparedDataList.size(); i++) {
             series2.add(i, preparedDataList.get(i).getImportantContent().length);
         }
 
@@ -115,10 +120,10 @@ public class ChartsGenerator {
     public void generateWordsLineChart(ArrayList<PreparedData> preparedDataList) throws IOException {
         XYSeries series = new XYSeries("Totally");
         XYSeries series2 = new XYSeries("Important");
-        for(int i = 0; i < preparedDataList.size(); i++) {
+        for (int i = 0; i < preparedDataList.size(); i++) {
             series.add(i, preparedDataList.get(i).getContentTotally().length);
         }
-        for(int i = 0; i < preparedDataList.size(); i++) {
+        for (int i = 0; i < preparedDataList.size(); i++) {
             series2.add(i, preparedDataList.get(i).getImportantContent().length);
         }
         XYSeriesCollection dataset = new XYSeriesCollection();
@@ -149,6 +154,21 @@ public class ChartsGenerator {
         plot.setRangeGridlinesVisible(false);
         plot.setDomainGridlinesVisible(false);
 
-        ChartUtils.saveChartAsPNG(new File("charts/xychart.png"), chart, 9000, 2000);
+        generateChart("xychart", chart);
+    }
+
+    private void generateChart(String chartName, JFreeChart chart){
+        generateChart(chartName, chart, 9000, 2000);
+    }
+
+    private void generateChart(String chartName, JFreeChart chart, int width, int height){
+        try {
+            File chartFile = new File("output/charts/" + path + "/" + chartName + ".png");
+            new File("output/charts/" + path + "/").mkdirs();
+            chartFile.createNewFile();
+            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

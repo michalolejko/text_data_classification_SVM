@@ -1,10 +1,11 @@
+package statistical;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
-public class CalculatedData {
+public class CalculatedData implements Serializable {
     public ArrayList<PreparedData> preparedDataList;
 
     public double minTotally = Double.MAX_VALUE, maxTotally = Double.MAX_VALUE;

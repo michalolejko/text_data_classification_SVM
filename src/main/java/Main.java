@@ -1,56 +1,40 @@
+import org.tensorflow.Signature;
+import org.tensorflow.op.Ops;
+import org.tensorflow.op.core.Placeholder;
+import org.tensorflow.op.math.Add;
+import org.tensorflow.types.TInt32;
+import others.MainManagement;
+import others.MyStopwatch;
 import statistical.StatisticalManager;
-
-import java.util.Scanner;
 
 public class Main {
 
-    static final int maxLinesToBeProcessedStatistical = 200_000;
-    static StatisticalManager[] statisticalManagerAcllmbds;
-    static StatisticalManager[] statisticalManagerAmazon;
+    public static final int maxLinesToBeProcessedStatistical = 10_000;
+    public static StatisticalManager[] statisticalManagerAcllmbds;
+    public static StatisticalManager[] statisticalManagerAmazon;
 
-    public static void main(String[] args) {
-        //menu();
+    public static void main(String[] args) throws Exception{
+        MyStopwatch stopwatch = new MyStopwatch();
+
+        //Menu.start();
         statisticalManagerAcllmbds = MainManagement.calculateStatisticalDataAcllmbd(maxLinesToBeProcessedStatistical, false, false);
         statisticalManagerAmazon = MainManagement.calculateStatisticalDataAmazon(maxLinesToBeProcessedStatistical,false, false);
+
+        System.out.println(stopwatch);
+
+//        System.out.println("Hello TensorFlow " + TensorFlow.version());
+//
+//        try (ConcreteFunction dbl = ConcreteFunction.create(Main::dbl);
+//             TInt32 x = TInt32.scalarOf(10);
+//             Tensor dblX = dbl.call(x)) {
+//            System.out.println(x.getInt() + " doubled is " + ((TInt32)dblX).getInt());
+//        }
     }
 
-    public static void menu() {
-        if (yesNoQuestion("Czy chcesz wykonac analize statystyczna?")) {
-            boolean charts = yesNoQuestion("Czy chcesz generowac wykresy?");
-            boolean files = yesNoQuestion("Czy chcesz generowac pliki txt?");
-            int aclMax = numericQuestion("Jak duzo chcesz obliczyc dla zbioru acllmbd? [0 jesli dla tego zbioru nie chcesz liczyc]");
-            int amazonMax = numericQuestion("Jak duzo chcesz obliczyc dla zbioru amazona? [0 jesli dla tego zbioru nie chcesz liczyc]");
-            if (aclMax > 0)
-                statisticalManagerAcllmbds = MainManagement.calculateStatisticalDataAcllmbd(aclMax, files, charts);
-            if (amazonMax > 0)
-                statisticalManagerAmazon = MainManagement.calculateStatisticalDataAcllmbd(amazonMax, files, charts);
-        }
-        System.out.println("Zakonczono.");
+    private static Signature dbl(Ops tf) {
+        Placeholder<TInt32> x = tf.placeholder(TInt32.class);
+        Add<TInt32> dblX = tf.math.add(x, x);
+        return Signature.builder().input("x", x).output("dbl", dblX).build();
     }
 
-    public static boolean yesNoQuestion(String question) {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.println(question + " [T/N]");
-            String s = scanner.nextLine();
-            if (s.contains("t") || s.contains("T"))
-                return true;
-            else if (s.contains("n") || s.contains("N"))
-                return false;
-            else System.out.println("Nieprawidlowa wartosc - wpisz 't' lub 'n'.");
-        }
-    }
-
-    public static int numericQuestion(String question) {
-        System.out.println(question);
-        Scanner sn = new Scanner(System.in);
-        while (true) {
-            String line = sn.nextLine();
-            try {
-                return Integer.parseInt(line);
-            } catch (NumberFormatException e) {
-                System.err.println("Niepoprawna wartosc - podaj liczbe:");
-            }
-        }
-    }
 }

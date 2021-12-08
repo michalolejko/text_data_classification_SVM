@@ -1,3 +1,5 @@
+package others;
+
 import statistical.StatisticalManager;
 import statistical.StatisticalManagerAcllmbd;
 import statistical.StatisticalManagerAmazon;

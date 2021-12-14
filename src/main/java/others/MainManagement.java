@@ -1,11 +1,14 @@
 package others;
 
+import explore.ExploreManager;
+import statistical.PreparedData;
 import statistical.StatisticalManager;
 import statistical.StatisticalManagerAcllmbd;
 import statistical.StatisticalManagerAmazon;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MainManagement {
@@ -13,7 +16,7 @@ public class MainManagement {
     public static final String[] aclImbdPaths = {
             "input/aclImdb/train/pos/",
             "input/aclImdb/train/neg/",
-            // "input/aclImdb/train/unsup/", //Nie obslugujemy juz tego
+            // "input/aclImdb/train/unsup/", //Nie obslugujemy tego
             "input/aclImdb/test/pos/",
             "input/aclImdb/test/neg/"
     };
@@ -23,12 +26,18 @@ public class MainManagement {
             "input/amazon/train.ft.txt"
     };
 
+    public static void runExplore(StatisticalManager[] managerArray) {
+        for(StatisticalManager manager : managerArray){
+            ExploreManager em = new ExploreManager();
+            em.vectorization(manager.getPreparedDataList());
+        }
+    }
 
     public static StatisticalManager[] calculateStatisticalDataAcllmbd(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
-        delimiter = Math.min(delimiter, aclImbdPaths.length);
-        StatisticalManagerAcllmbd[] dataManagerAcllmbds = new StatisticalManagerAcllmbd[delimiter];
+        //delimiter = Math.min(delimiter, aclImbdPaths.length);
+        StatisticalManagerAcllmbd[] dataManagerAcllmbds = new StatisticalManagerAcllmbd[aclImbdPaths.length];
         List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < delimiter; i++) {
+        for (int i = 0; i < aclImbdPaths.length; i++) {
             dataManagerAcllmbds[i] = new StatisticalManagerAcllmbd(delimiter, aclImbdPaths[i]);
 
             dataManagerAcllmbds[i].setGenerateFiles(generateTxtFiles);
@@ -45,7 +54,7 @@ public class MainManagement {
                 dataManagerAcllmbds[i].setNegativeData();
         }
         //start threads
-        for (int i = 0; i < delimiter; ++i) {
+        for (int i = 0; i < aclImbdPaths.length; ++i) {
             Thread t = new Thread(dataManagerAcllmbds[i]);
             t.start();
             threads.add(t);

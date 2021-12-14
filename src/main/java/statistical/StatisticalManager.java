@@ -1,7 +1,5 @@
 package statistical;
 
-import explore.ExploreManager;
-
 import java.io.*;
 import java.util.ArrayList;
 
@@ -96,11 +94,6 @@ public abstract class StatisticalManager implements Runnable, Serializable {
             generateRaport();
         if (generateCharts)
             generateCharts();
-    }
-
-    protected void runExplore() {
-        ExploreManager em = new ExploreManager();
-        em.vectorization(getPreparedDataList());
     }
 
     protected void generateCharts() {

@@ -27,7 +27,6 @@ public class StatisticalManagerAcllmbd extends StatisticalManager {
         //punkt 6 - analiza statystyczna
         addRegressionInfoToFiles();
         generateFilesAndCharts();
-        runExplore();
     }
 
     protected void generateRaport() {

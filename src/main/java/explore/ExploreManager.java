@@ -10,9 +10,7 @@ import statistical.PreparedData;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import smile.classification.RandomForest;
 import smile.classification.SVM;
@@ -23,7 +21,6 @@ import smile.math.Math;
 import smile.math.kernel.LinearKernel;
 import smile.validation.Accuracy;
 import smile.validation.ConfusionMatrix;
-import java.util.Set;
 
 public class ExploreManager {
 
@@ -33,7 +30,6 @@ public class ExploreManager {
         CountVectorizer cv = new CountVectorizer(5, true, true, true);
 
         //data prepare
-
         List<List<String>> dataToTransform = new ArrayList<>();
         for(int i = 0; i < preparedDataList.size(); i ++) {
             List<String> wordsInDocument = Lists.newArrayList(preparedDataList.get(i).getImportantContent());

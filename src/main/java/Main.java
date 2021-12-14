@@ -15,12 +15,16 @@ public class Main {
     public static StatisticalManager[] statisticalManagerAcllmbds;
     public static StatisticalManager[] statisticalManagerAmazon;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         MyStopwatch stopwatch = new MyStopwatch();
 
-        Menu.start(maxLinesToBeProcessedStatistical);
+        //Menu.start(maxLinesToBeProcessedStatistical);
+
         statisticalManagerAcllmbds = MainManagement.calculateStatisticalDataAcllmbd(maxLinesToBeProcessedStatistical, false, false);
-        statisticalManagerAmazon = MainManagement.calculateStatisticalDataAmazon(maxLinesToBeProcessedStatistical,false, false);
+        MainManagement.runExplore(statisticalManagerAcllmbds);
+
+        statisticalManagerAmazon = MainManagement.calculateStatisticalDataAmazon(maxLinesToBeProcessedStatistical, false, false);
+        MainManagement.runExplore(statisticalManagerAmazon);
 
         System.out.println(stopwatch);
 

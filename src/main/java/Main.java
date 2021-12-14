@@ -21,9 +21,9 @@ public class Main {
         //Menu.start(maxLinesToBeProcessedStatistical);
 
         statisticalManagerAcllmbds = MainManagement.calculateStatisticalDataAcllmbd(maxLinesToBeProcessedStatistical, false, false);
-        MainManagement.runExplore(statisticalManagerAcllmbds);
-
         statisticalManagerAmazon = MainManagement.calculateStatisticalDataAmazon(maxLinesToBeProcessedStatistical, false, false);
+        
+        MainManagement.runExplore(statisticalManagerAcllmbds);
         MainManagement.runExplore(statisticalManagerAmazon);
 
         System.out.println(stopwatch);

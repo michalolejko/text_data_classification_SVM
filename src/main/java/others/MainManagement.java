@@ -34,7 +34,6 @@ public class MainManagement {
     }
 
     public static StatisticalManager[] calculateStatisticalDataAcllmbd(int delimiter, boolean generateTxtFiles, boolean generateCharts) {
-        //delimiter = Math.min(delimiter, aclImbdPaths.length);
         StatisticalManagerAcllmbd[] dataManagerAcllmbds = new StatisticalManagerAcllmbd[aclImbdPaths.length];
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < aclImbdPaths.length; i++) {

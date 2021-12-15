@@ -2,7 +2,9 @@ package explore;
 
 import com.google.common.collect.Lists;
 import smile.classification.SoftClassifier;
+import smile.data.Datum;
 import smile.data.SparseDataset;
+import smile.math.SparseArray;
 import smile.validation.CrossValidation;
 import smile.math.Math;
 import statistical.PreparedData;
@@ -39,7 +41,12 @@ public class ExploreManager {
         SparseDataset sd = cv.fitTransform(dataToTransform);
 
         //print vocabulary
-        System.out.println("(CrossValidation) Vocabulary: " + cv.vocabulary());
+        //System.out.println("(CrossValidation) Vocabulary: " + cv.vocabulary());
+        for(int i = 0; i<sd.toArray().length; i++){
+            for(int j = 0; j<sd.ncols(); j++)
+                System.out.println(sd.get(i,j));
+        }
+
     }
 
     // przykładowa implementacja - walidacja krzyżowa i trening modelu sieci

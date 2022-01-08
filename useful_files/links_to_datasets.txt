@@ -1,2 +1,2 @@
 http://ai.stanford.edu/~amaas/data/sentiment/
-https://grouplens.org/datasets/movielens/latest/
+https://www.kaggle.com/bittlingmayer/amazonreviews

@@ -2,7 +2,10 @@ package explore;
 
 import com.google.common.collect.Lists;
 import smile.classification.SoftClassifier;
+import smile.data.Dataset;
+import smile.data.Datum;
 import smile.data.SparseDataset;
+import smile.math.SparseArray;
 import smile.validation.CrossValidation;
 import smile.math.Math;
 import statistical.PreparedData;
@@ -10,9 +13,7 @@ import statistical.PreparedData;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import smile.classification.RandomForest;
 import smile.classification.SVM;
@@ -23,7 +24,6 @@ import smile.math.Math;
 import smile.math.kernel.LinearKernel;
 import smile.validation.Accuracy;
 import smile.validation.ConfusionMatrix;
-import java.util.Set;
 
 public class ExploreManager {
 
@@ -33,7 +33,6 @@ public class ExploreManager {
         CountVectorizer cv = new CountVectorizer(5, true, true, true);
 
         //data prepare
-
         List<List<String>> dataToTransform = new ArrayList<>();
         for(int i = 0; i < preparedDataList.size(); i ++) {
             List<String> wordsInDocument = Lists.newArrayList(preparedDataList.get(i).getImportantContent());
@@ -44,30 +43,35 @@ public class ExploreManager {
 
         //print vocabulary
         System.out.println("(CrossValidation) Vocabulary: " + cv.vocabulary());
+        for(int i = 0; i<sd.toArray().length; i++){
+            for(int j = 0; j<sd.ncols(); j++) {
+                //System.out.println(sd.get(i,j));
+            }
+        }
+        try {
+            trainModel(null, false, sd);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // przykładowa implementacja - walidacja krzyżowa i trening modelu sieci
 
-    public static void trainModel(String trainingPath, String outputPath, String learner,
-                                  int responseIndex, boolean skipCrossValidation) throws Exception {
+    public static void trainModel(String learner, boolean skipCrossValidation, SparseDataset sd) throws Exception {
 
         if (learner == null) {
             learner = "SVM";
         }
-
         System.out.println("Learning algorithm: " + learner);
-        String modelFilePath = Paths.get(outputPath, "pageclassifier.model").toString();
 
-        ArffParser arffParser = new ArffParser();
-        arffParser.setResponseIndex(responseIndex);
+        //AttributeDataset trainingData = arffParser.parse(fis);
+        //double[][] x = trainingData.toArray(new double[trainingData.size()][]);
+        //int[] y = trainingData.toArray(new int[trainingData.size()]);
 
-        Path arffFilePath = Paths.get(trainingPath, "/smile_input.arff");
-        FileInputStream fis = new FileInputStream(arffFilePath.toFile());
-        System.out.println("Writting temporarily data file to: " + arffFilePath.toString());
-
-        AttributeDataset trainingData = arffParser.parse(fis);
-        double[][] x = trainingData.toArray(new double[trainingData.size()][]);
-        int[] y = trainingData.toArray(new int[trainingData.size()]);
+        double[][] x = sd.toArray();
+        System.out.println(sd.size());
+        int[] y = sd.toArray(new int[sd.size()]);
 
         SoftClassifier<double[]> finalModel = null;
         if (skipCrossValidation) {
@@ -77,7 +81,6 @@ public class ExploreManager {
             System.out.println("Starting cross-validation...");
             finalModel = trainModelCV(learner, x, y);
         }
-        System.out.println("Writing model to file: " + modelFilePath);
     }
 
     private static SoftClassifier<double[]> trainModelCV(String learner, double[][] x, int[] y) {

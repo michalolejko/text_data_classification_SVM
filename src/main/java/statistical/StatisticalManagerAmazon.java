@@ -24,7 +24,6 @@ public class StatisticalManagerAmazon extends StatisticalManager {
         calculatePearsonLCC();
 
         generateFilesAndCharts();
-        runExplore();
     }
 
     @Override
